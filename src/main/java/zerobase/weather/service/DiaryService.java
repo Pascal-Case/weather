@@ -4,11 +4,14 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import zerobase.weather.WeatherApplication;
 import zerobase.weather.domain.DateWeather;
 import zerobase.weather.domain.Diary;
 import zerobase.weather.repository.DateWeatherRepository;
@@ -33,6 +36,8 @@ public class DiaryService {
     private final DateWeatherRepository dateWeatherRepository;
     private final DiaryRepository diaryRepository;
 
+    private static final Logger logger = LoggerFactory.getLogger(WeatherApplication.class);
+
     public DiaryService(DateWeatherRepository dateWeatherRepository, DiaryRepository diaryRepository) {
         this.dateWeatherRepository = dateWeatherRepository;
         this.diaryRepository = diaryRepository;
@@ -46,6 +51,7 @@ public class DiaryService {
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public void createDiary(LocalDate date, String text) {
+        logger.info("started to create diary");
         // 날씨 데이터 가져오기 (API OR DB)
         DateWeather dateWeather = getDateWeather(date);
 
@@ -56,10 +62,12 @@ public class DiaryService {
         nowDiary.setDate(date);
 
         diaryRepository.save(nowDiary);
+        logger.info("end to create diary");
     }
 
     @Transactional(readOnly = true)
     public List<Diary> readDiary(LocalDate date) {
+        logger.debug("read diary");
         return diaryRepository.findAllByDate(date);
     }
 
@@ -105,17 +113,7 @@ public class DiaryService {
     private String getWeatherString() {
         String apiUrl = "https://api.openweathermap.org/data/2.5/weather?q=seoul&&APPID=" + apikey;
         try {
-            URL url = new URL(apiUrl);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            int responseCode = connection.getResponseCode();
-            BufferedReader br;
-            if (responseCode == 200) {
-                br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-
-            } else {
-                br = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
-            }
+            BufferedReader br = getBufferedReader(apiUrl);
 
             String inputLine;
             StringBuilder response = new StringBuilder();
@@ -130,6 +128,21 @@ public class DiaryService {
             return "failed to get response";
 
         }
+    }
+
+    private static BufferedReader getBufferedReader(String apiUrl) throws IOException {
+        URL url = new URL(apiUrl);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        int responseCode = connection.getResponseCode();
+        BufferedReader br;
+        if (responseCode == 200) {
+            br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+        } else {
+            br = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+        }
+        return br;
     }
 
     private Map<String, Object> parseWeather(String jsonString) {
