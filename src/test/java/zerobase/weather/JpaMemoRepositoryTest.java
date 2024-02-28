@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest
-@Transactional
+@Transactional // 테스트코드에 Transactional 어노테이션시 commit 안함
 public class JpaMemoRepositoryTest {
 
     @Autowired
