@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Entity(name = "diary")
 @Builder
-@Schema(description = "날씨 일기 응답")
+@Schema(description = "날씨 일기 데이터")
 public class Diary {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +26,7 @@ public class Diary {
     private String weather;
     @Schema(description = "아이콘")
     private String icon;
-    @Schema(description = "온도")
+    @Schema(description = "기온")
     private double temperature;
     @Schema(description = "일기 본문")
     private String text;
