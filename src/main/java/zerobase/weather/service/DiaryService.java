@@ -47,7 +47,7 @@ public class DiaryService {
     }
 
     @Transactional
-    @Scheduled(cron = "*/10 * * * * *") // 매일 01시 0분 0초에 실행
+    @Scheduled(cron = "0 0 1 * * *") // 매일 01시 0분 0초에 실행
     public void saveWeatherDate() {
         logger.info("Start saving weather data.");
         dateWeatherRepository.save(getWeatherFromApi());
