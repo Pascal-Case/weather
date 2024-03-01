@@ -25,8 +25,8 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleDiaryException(DiaryException e) {
         logger.error("DiaryException occurred: {}", e.getMessage(), e);
         return new ErrorResponse(
-                INVALID_REQUEST,
-                INVALID_REQUEST.getDescription()
+                e.getErrorCode(),
+                e.getErrorMessage()
         );
     }
 
