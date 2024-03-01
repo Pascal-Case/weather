@@ -114,7 +114,7 @@ public class DiaryService {
         logger.info("Diary deleted successfully.");
     }
 
-    private DateWeather getDateWeather(LocalDate date) {
+    protected DateWeather getDateWeather(LocalDate date) {
         logger.info("Start getting dateWeather for date: {}", date);
         validateDate(date);
         List<DateWeather> dateWeatherListFromDB = dateWeatherRepository.findAllByDate(date);
@@ -129,7 +129,7 @@ public class DiaryService {
         return dateWeather;
     }
 
-    private DateWeather getWeatherFromApi() {
+    protected DateWeather getWeatherFromApi() {
         logger.info("Start getting dateWeather from APi");
         String weatherData = getWeatherString();
         Map<String, Object> parsedWeather = parseWeather(weatherData);
